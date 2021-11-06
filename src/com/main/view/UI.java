@@ -1,8 +1,7 @@
 package com.main.view;
 
-import com.main.service.FriendshipService;
+import com.main.controller.Controller;
 import com.main.service.ServiceException;
-import com.main.service.UserService;
 import com.main.model.Friendship;
 import com.main.model.User;
 import com.main.model.validators.ValidationException;
@@ -17,17 +16,15 @@ import java.util.*;
  */
 public class UI extends Thread{
     private static final Map<Integer, Method> cmdList = new HashMap<>();
-    private static FriendshipService friendshipService;
-    private static UserService userService;
+    private static Controller controller;
     private static final Scanner keyboard = new Scanner(System.in);
 
     /**
      * a basic command line UI
-     * @param friendshipService controller for friendships and users
+     * @param Controller controller for friendships and users services
      */
-    public UI(FriendshipService friendshipService){
-        UI.friendshipService = friendshipService;
-        userService = UI.friendshipService.userService;
+    public UI(Controller controller){
+        UI.controller = controller;
         try {
             cmdList.put(1,UI.class.getMethod("addUser"));
             cmdList.put(2,UI.class.getMethod("deleteUser"));
@@ -53,7 +50,7 @@ public class UI extends Thread{
         String lastName = keyboard.nextLine();
         User user = new User(firstName,lastName);
         user.setId(ID);
-        if(userService.add(user) != null)
+        if(controller.addUser(user) != null)
             throw new RepositoryException("User already exists.");
     }
     public static void deleteUser(){
@@ -62,11 +59,11 @@ public class UI extends Thread{
         Long ID = keyboard.nextLong();
         User user = new User("", "");
         user.setId(ID);
-        if(friendshipService.deleteUser(user) == null)
+        if(controller.deleteUser(user) == null)
             throw new RepositoryException("User doesn't exist.");
     }
     public static void showUsers(){
-        for(Object u : userService.getAllEntities())
+        for(Object u : controller.getAllUsers())
             System.out.println(u);
     }
 
@@ -78,7 +75,7 @@ public class UI extends Thread{
         keyboard.nextLine();
         Long ID2 = keyboard.nextLong();
         Friendship friendship = new Friendship(ID1,ID2);
-        friendshipService.add(friendship);
+        controller.addFriendship(friendship);
     }
     public static void deleteFriendship(){
         System.out.println("ID user 1:");
@@ -88,28 +85,26 @@ public class UI extends Thread{
         keyboard.nextLine();
         Long ID2 = keyboard.nextLong();
         Friendship friendship = new Friendship(ID1,ID2);
-        friendshipService.delete(friendship);
+        controller.deleteFriendship(friendship);
     }
     public static void showAllFriendships(){
-        for(Friendship fr : friendshipService.getAllEntities())
+        for(Friendship fr : controller.getAllFriendships())
             System.out.println(fr);
     }
 
     public static void showCommunities(){
-        friendshipService.runGraph();
-        for(List<Long> idList : friendshipService.getCommunities()){
+        for(List<Long> idList : controller.getAllCommunities()){
             System.out.println("Community:");
             for(Long id : idList){
-                User user = friendshipService.userService.findOne(id);
+                User user = controller.findUserById(id);
                 if(user != null)
                     System.out.println(user);
             }
         }
     }
     public static void biggestCommunity(){
-        friendshipService.runGraph();
         System.out.println("Biggest community is made of " +
-                friendshipService.getBiggestCommunity() + " users");
+                controller.getBiggestCommunitySize() + " users");
     }
 
     public static void help(){

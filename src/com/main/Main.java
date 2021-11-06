@@ -1,5 +1,7 @@
 package com.main;
 
+import com.main.controller.Controller;
+import com.main.controller.ControllerClass;
 import com.main.service.FriendshipService;
 import com.main.service.UserService;
 import com.main.model.Friendship;
@@ -23,7 +25,8 @@ public class Main {
         Repository<Tuple<Long,Long>, Friendship> friendshipRepo= new FriendshipFile(friendshipFileName, friendshipValidator);
         UserService userService = new UserService(userRepo, userValidator);
         FriendshipService friendshipService = new FriendshipService(friendshipRepo, friendshipValidator, userService);
-        UI ui = new UI(friendshipService);
+        Controller controller = new ControllerClass(userService,friendshipService);
+        UI ui = new UI(controller);
         ui.start();
         System.out.println("Sayonara");
     }
