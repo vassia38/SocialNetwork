@@ -1,6 +1,7 @@
 package com.main.algo;
 
-import com.main.service.FriendshipService;
+import com.main.controller.Controller;
+import com.main.controller.ControllerClass;
 import com.main.model.Friendship;
 import com.main.model.User;
 
@@ -17,13 +18,13 @@ public class Graph {
      * create a Graph of friendships using a given controller
      * @param controller a FriendshipService
      */
-    public Graph(FriendshipService controller){
+    public Graph(ControllerClass controller){
         V = controller.userService.size();
         for(User user : controller.userService.getAllEntities()){
             userIDs.add(user.getId());
             adj.add(new ArrayList<>());
         }
-        for(Friendship fr : controller.getAllEntities()){
+        for(Friendship fr : controller.friendshipService.getAllEntities()){
             this.addEdge(fr.getId().getLeft(), fr.getId().getRight());
         }
     }

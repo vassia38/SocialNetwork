@@ -7,6 +7,11 @@ public class Friendship extends Entity<Tuple<Long,Long>> {
     LocalDateTime date;
 
     public Friendship(Long u1, Long u2) {
+        if(u1 > u2){
+            Long aux = u1;
+            u1 = u2;
+            u2 = aux;
+        }
         Tuple<Long,Long> id = new Tuple<>(u1,u2);
         this.setId(id);
         date = LocalDateTime.now();

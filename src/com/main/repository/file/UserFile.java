@@ -25,12 +25,6 @@ public class UserFile extends AbstractFileRepository<Long, User> {
 
     @Override
     public User delete(Long id){
-        User removed = super.delete(id);
-        if(removed != null){
-            for(User user : this.findAll()){
-                user.removeFriend(removed);
-            }
-        }
-        return removed;
+        return super.delete(id);
     }
 }

@@ -1,5 +1,6 @@
 package com.main.controller;
 
+import com.main.algo.Graph;
 import com.main.model.Friendship;
 import com.main.model.User;
 import com.main.repository.RepositoryException;
@@ -10,8 +11,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class ControllerClass implements Controller{
-    private final UserService userService;
-    private final  FriendshipService friendshipService;
+    public final UserService userService;
+    public final  FriendshipService friendshipService;
+    Graph graph;
 
     public ControllerClass(UserService userService, FriendshipService friendshipService){
         this.userService = userService;
@@ -53,46 +55,47 @@ public class ControllerClass implements Controller{
 
     @Override
     public void addFriendship(Friendship entity) {
-        Friendship fr = friendshipService.add(entity);
-        if(fr != null)
-            throw new RepositoryException("Friendship Already exists!\n");
         Long id1 = entity.getId().getLeft();
         User user1 = userService.findOne(id1);
         Long id2 = entity.getId().getRight();
         User user2 = userService.findOne(id2);
         if(user1 == null || user2 == null)
             throw new RepositoryException("User(s) doesn't exist!\n");
-        user1.addFriend(user2);
-        user2.addFriend(user1);
+        Friendship fr = friendshipService.add(entity);
+        if(fr != null)
+            throw new RepositoryException("Friendship Already exists!\n");
+
     }
 
     @Override
     public void deleteFriendship(Friendship entity) {
-        Friendship fr = friendshipService.delete(entity);
-        if(fr == null)
-            throw new RepositoryException("Friendship doesn't exist!\n");
         Long id1 = entity.getId().getLeft();
         User user1 = userService.findOne(id1);
         Long id2 = entity.getId().getRight();
         User user2 = userService.findOne(id2);
         if(user1 == null || user2 == null)
             throw new RepositoryException("User(s) doesn't exist!\n");
-        user1.removeFriend(user2);
-        user2.removeFriend(user1);
+        Friendship fr = friendshipService.delete(entity);
+        if(fr == null)
+            throw new RepositoryException("Friendship doesn't exist!\n");
     }
 
     @Override
     public Iterable<Friendship> getAllFriendships() {
         return friendshipService.getAllEntities();
     }
-
-    @Override
-    public ArrayList<ArrayList<Long>> getAllCommunities() {
-        return friendshipService.getAllCommunities();
+    private void runGraph(){
+        graph = new Graph(this);
+        graph.runConnectedComponents();
     }
-
     @Override
-    public int getBiggestCommunitySize() {
-        return friendshipService.getBiggestCommunitySize();
+    public ArrayList<ArrayList<Long>> getAllCommunities(){
+        this.runGraph();
+        return graph.getCommunities();
+    }
+    @Override
+    public int getBiggestCommunitySize(){
+        this.runGraph();
+        return graph.maxSize();
     }
 }

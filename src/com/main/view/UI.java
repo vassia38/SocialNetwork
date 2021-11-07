@@ -29,42 +29,47 @@ public class UI extends Thread{
             cmdList.put(1,UI.class.getMethod("addUser"));
             cmdList.put(2,UI.class.getMethod("deleteUser"));
             cmdList.put(3,UI.class.getMethod("showUsers"));
-            cmdList.put(4,UI.class.getMethod("addFriendship"));
-            cmdList.put(5,UI.class.getMethod("deleteFriendship"));
-            cmdList.put(6,UI.class.getMethod("showAllFriendships"));
-            cmdList.put(7,UI.class.getMethod("showCommunities"));
-            cmdList.put(8,UI.class.getMethod("biggestCommunity"));
-            cmdList.put(9,UI.class.getMethod("help"));
+            cmdList.put(4,UI.class.getMethod("findUserById"));
+            cmdList.put(5,UI.class.getMethod("addFriendship"));
+            cmdList.put(6,UI.class.getMethod("deleteFriendship"));
+            cmdList.put(7,UI.class.getMethod("showAllFriendships"));
+            cmdList.put(8,UI.class.getMethod("showCommunities"));
+            cmdList.put(9,UI.class.getMethod("biggestCommunity"));
+            cmdList.put(10,UI.class.getMethod("help"));
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
     public static void addUser(){
-        System.out.println("ID:");
+        /*System.out.println("ID:");
         keyboard.nextLine();
-        Long ID = keyboard.nextLong();
+        Long ID = keyboard.nextLong();*/
         System.out.println("First name:");
         keyboard.nextLine();
         String firstName = keyboard.nextLine();
         System.out.println("Last name:");
         String lastName = keyboard.nextLine();
         User user = new User(firstName,lastName);
-        user.setId(ID);
-        if(controller.addUser(user) != null)
-            throw new RepositoryException("User already exists.");
+        //user.setId(ID);
+        controller.addUser(user);
     }
     public static void deleteUser(){
         System.out.println("ID:");
         keyboard.nextLine();
-        Long ID = keyboard.nextLong();
+        Long id = keyboard.nextLong();
         User user = new User("", "");
-        user.setId(ID);
-        if(controller.deleteUser(user) == null)
-            throw new RepositoryException("User doesn't exist.");
+        user.setId(id);
+        controller.deleteUser(user);
     }
     public static void showUsers(){
         for(Object u : controller.getAllUsers())
             System.out.println(u);
+    }
+    public static void findUserById(){
+        System.out.println("ID:");
+        keyboard.nextLine();
+        Long id = keyboard.nextLong();
+        System.out.println(controller.findUserById(id));
     }
 
     public static void addFriendship(){
@@ -111,12 +116,13 @@ public class UI extends Thread{
         System.out.println("1 = add user");
         System.out.println("2 = delete user");
         System.out.println("3 = show all users");
-        System.out.println("4 = add friendship");
-        System.out.println("5 = delete friendship");
-        System.out.println("6 = show all friendships");
-        System.out.println("7 = show all communities");
-        System.out.println("8 = size of biggest community");
-        System.out.println("9 = help");
+        System.out.println("4 = find user by id");
+        System.out.println("5 = add friendship");
+        System.out.println("6 = delete friendship");
+        System.out.println("7 = show all friendships");
+        System.out.println("8 = show all communities");
+        System.out.println("9 = size of biggest community");
+        System.out.println("10 = help");
         System.out.println("0 = exit");
     }
     public void start(){

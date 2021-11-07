@@ -1,29 +1,35 @@
 package com.main.service;
 
 import com.main.model.User;
-import com.main.model.validators.Validator;
 import com.main.repository.Repository;
+import com.main.repository.RepositoryException;
 
 public class UserService {
     public final Repository<Long, User> userRepo;
-    public final Validator<User> userValidator;
-    public UserService(Repository<Long, User> userRepo, Validator<User> userValidator){
+    public UserService(Repository<Long, User> userRepo){
         this.userRepo = userRepo;
-        this.userValidator = userValidator;
     }
 
     public User add(User entity){
-        userValidator.validate(entity);
-        return userRepo.save(entity);
+        User res = userRepo.save(entity);
+        if(res != null)
+            throw new RepositoryException("User already exists.");
+        return res;
     }
     public User delete(User entity){
-        return userRepo.delete(entity.getId());
+        User res = userRepo.delete(entity.getId());
+        if(res == null)
+            throw new RepositoryException("User doesn't exist.");
+        return res;
     }
     public Iterable<User> getAllEntities(){
         return userRepo.findAll();
     }
     public User findOne(Long id){
-        return userRepo.findOne(id);
+        User res = userRepo.findOne(id);
+        if(res == null)
+            throw new RepositoryException("User doesn't exist.");
+        return res;
     }
     public Integer size(){
         return userRepo.size();
