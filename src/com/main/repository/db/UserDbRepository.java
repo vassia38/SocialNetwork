@@ -4,6 +4,7 @@ import  com.main.model.User;
 import  com.main.model.validators.Validator;
 
 import com.main.repository.Repository;
+import com.main.repository.RepositoryException;
 
 import java.sql.*;
 import java.util.HashSet;
@@ -23,7 +24,8 @@ public class UserDbRepository implements Repository<Long, User> {
     }
     @Override
     public User findOne(Long id) {
-        User found = null;
+        if (id==null)
+            throw new IllegalArgumentException("entity must be not null");
         String sqlSelect = "select * from users where id=?";
         try(Connection connection = DriverManager.getConnection(url,username,password);
              PreparedStatement psSelect = connection.prepareStatement(sqlSelect)){
@@ -32,13 +34,12 @@ public class UserDbRepository implements Repository<Long, User> {
             if(resultSet.next()) {
                 String firstName = resultSet.getString("first_name");
                 String lastName = resultSet.getString("last_name");
-                found = new User(firstName, lastName);
-                found.setId(id);
+                return new User(id,firstName, lastName);
             }
         }catch(SQLException e){
             e.printStackTrace();
         }
-        return found;
+        return null;
     }
 
     @Override
@@ -53,8 +54,7 @@ public class UserDbRepository implements Repository<Long, User> {
                 String firstName = resultSet.getString("first_name");
                 String lastName = resultSet.getString("last_name");
 
-                User utilizator = new User(firstName, lastName);
-                utilizator.setId(id);
+                User utilizator = new User(id,firstName, lastName);
                 users.add(utilizator);
             }
         } catch (SQLException e) {
@@ -67,13 +67,10 @@ public class UserDbRepository implements Repository<Long, User> {
     public User save(User entity) {
         this.validator.validate(entity);
         String sql = "insert into users (first_name, last_name ) values (?, ?)";
-
         try (Connection connection = DriverManager.getConnection(url, username, password);
              PreparedStatement ps = connection.prepareStatement(sql)) {
-
             ps.setString(1, entity.getFirstName());
             ps.setString(2, entity.getLastName());
-
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -83,57 +80,48 @@ public class UserDbRepository implements Repository<Long, User> {
 
     @Override
     public User delete(Long id) {
-        User deleted = null;
-        String sqlSelect = "select * from users where (id=?)";
+        User found = this.findOne(id);
+        if(found == null)
+            return null;
         String sqlDelete = "delete from users where (id=?)";
         try (Connection connection = DriverManager.getConnection(url, username, password);
-             PreparedStatement psSelect = connection.prepareStatement(sqlSelect);
-             PreparedStatement psDelete = connection.prepareStatement(sqlDelete)
-             ) {
-            psSelect.setLong(1,id);
-            ResultSet resultSet = psSelect.executeQuery();
-            if (resultSet.next()) {
-                String firstName = resultSet.getString("first_name");
-                String lastName = resultSet.getString("last_name");
-                deleted = new User(firstName, lastName);
-                deleted.setId(id);
-            }
+             PreparedStatement psDelete = connection.prepareStatement(sqlDelete)){
             psDelete.setLong(1, id);
             psDelete.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return deleted;
+        return found;
     }
 
     @Override
     public Integer size() {
-        Integer s = null;
-        String sqlCount = "select count(*) as size from users";
+        String sqlCount = "select count(*) from users";
         try(Connection connection = DriverManager.getConnection(url,username,password);
              PreparedStatement psCount = connection.prepareStatement(sqlCount)){
             ResultSet resultSet = psCount.executeQuery();
             resultSet.next();
-            s = resultSet.getInt("size");
+            return resultSet.getInt(1);
         }
         catch(SQLException e){
             e.printStackTrace();
         }
-        return s;
+        return 0;
     }
 
     @Override
     public User update(User entity) {
-        String sqlUpdate = "update users set first_name=?, last_name=? " +
-                "where id=?";
-        User oldState = null;
+        User oldState = this.findOne(entity.getId());
+        if(oldState == null)
+            return null;
+        String sqlUpdate = "update users set first_name=?, last_name=? where id=?";
         try(Connection connection = DriverManager.getConnection(url,username,password);
              PreparedStatement psUpdate = connection.prepareStatement(sqlUpdate)){
             psUpdate.setString(1,entity.getFirstName());
             psUpdate.setString(2,entity.getLastName());
             psUpdate.setLong(3,entity.getId());
-            oldState = this.findOne(entity.getId());
             psUpdate.executeUpdate();
+
         }catch(SQLException e){
             e.printStackTrace();
         }

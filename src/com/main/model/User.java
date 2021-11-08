@@ -10,6 +10,10 @@ public class User extends Entity<Long> {
         this.firstName = firstName;
         this.lastName = lastName;
     }
+    public User(Long id, String firstName, String lastName){
+        this(firstName,lastName);
+        super.setId(id);
+    }
 
     public String getFirstName() {
         return firstName;

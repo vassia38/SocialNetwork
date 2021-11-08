@@ -15,11 +15,9 @@ public class FriendshipFile extends AbstractFileRepository<Tuple<Long,Long>, Fri
 
     @Override
     public Friendship extractEntity(List<String> attributes) {
-        Friendship pr = new Friendship(LocalDateTime.parse(attributes.get(2)));
         Long id1 = Long.parseLong(attributes.get(0));
         Long id2 = Long.parseLong(attributes.get(1));
-        pr.setId(new Tuple<>(id1,id2));
-        return pr;
+        return new Friendship(id1,id2,LocalDateTime.parse(attributes.get(2)));
     }
 
     @Override

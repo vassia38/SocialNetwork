@@ -2,7 +2,6 @@ package com.main.service;
 
 import com.main.model.User;
 import com.main.repository.Repository;
-import com.main.repository.RepositoryException;
 
 public class UserService {
     public final Repository<Long, User> userRepo;
@@ -11,25 +10,19 @@ public class UserService {
     }
 
     public User add(User entity){
-        User res = userRepo.save(entity);
-        if(res != null)
-            throw new RepositoryException("User already exists.");
-        return res;
+        return userRepo.save(entity);
     }
     public User delete(User entity){
-        User res = userRepo.delete(entity.getId());
-        if(res == null)
-            throw new RepositoryException("User doesn't exist.");
-        return res;
+        return userRepo.delete(entity.getId());
+    }
+    public User update(User entity){
+        return userRepo.update(entity);
     }
     public Iterable<User> getAllEntities(){
         return userRepo.findAll();
     }
     public User findOne(Long id){
-        User res = userRepo.findOne(id);
-        if(res == null)
-            throw new RepositoryException("User doesn't exist.");
-        return res;
+        return userRepo.findOne(id);
     }
     public Integer size(){
         return userRepo.size();

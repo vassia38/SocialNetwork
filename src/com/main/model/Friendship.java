@@ -1,6 +1,7 @@
 package com.main.model;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class Friendship extends Entity<Tuple<Long,Long>> {
 
@@ -16,8 +17,9 @@ public class Friendship extends Entity<Tuple<Long,Long>> {
         this.setId(id);
         date = LocalDateTime.now();
     }
-    public Friendship(LocalDateTime time){
-        setDate(time);
+    public Friendship(Long u1, Long u2,LocalDateTime time){
+        this(u1,u2);
+        this.setDate(time);
     }
     public void setDate(LocalDateTime time){
         date = time;
@@ -32,5 +34,17 @@ public class Friendship extends Entity<Tuple<Long,Long>> {
     public String toString(){
         return this.getId().getLeft() + " " + this.getId().getRight() +", " +
                 this.getDate();
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Friendship)) return false;
+        Friendship that = (Friendship) o;
+        return this.getId().equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(),getDate());
     }
 }
