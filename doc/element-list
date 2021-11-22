@@ -1,9 +1,0 @@
-com.main
-com.main.algo
-com.main.controller
-com.main.model
-com.main.model.validators
-com.main.repository
-com.main.repository.file
-com.main.repository.memory
-com.main.view
